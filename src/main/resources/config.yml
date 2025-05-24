@@ -1,0 +1,66 @@
+# ap-sabers Configuration
+
+# Key to activate/deactivate the lightsaber. Uses Minecraft Key Codes.
+# Default: Q (KEY_Q) - You might need to map this to the drop key event.
+# Other common options: F (KEY_F for offhand swap)
+# For simplicity with player drop key:
+
+activationKey: "DROP_ITEM"
+
+duelSettings:
+  # Damage dealt by any lightsaber per successful hit during an active duel.
+  damagePerHit: 1.0
+  # "Health" points each player has at the start of a lightsaber duel.
+  # This is separate from their normal Minecraft health.
+  healthPoints: 10
+
+sabers:
+  luke_skywalker_green:
+    displayName: "&aLuke's Lightsaber"
+    lore:
+      - "&7An elegant weapon..."
+      - "&7...for a more civilized age."
+    item: "GOLDEN_SHOVEL"
+    enchanted: true
+    inactiveModelId: 10001
+    activeModelId: 10002
+    sounds:
+      activate: "apsabers.activate"
+      deactivate: "apsabers.deactivate"
+      hum: "apsabers.hum"
+      swing: "apsabers.swing.fast"
+      clash: "apsabers.clash.metal"
+    damage: 8.0 # Optional
+    defenseRating: 0.1 # Example: 10% damage reduction when blocking/hit in a duel
+    enabled_abilities:
+      block_deflection: true
+      force_push: true
+      saber_throw: false
+      blaster_bolt_block: true
+      force_leap: true
+      stealth_cloak: false
+
+  darth_vader_red:
+    displayName: "&cLord Vader's Lightsaber"
+    lore:
+      - "&4The weapon of a Sith Lord."
+    item: "GOLDEN_SHOVEL"
+    enchanted: false
+    inactiveModelId: 10003
+    activeModelId: 10004
+    sounds:
+      activate: "apsabers.activate"
+      deactivate: "apsabers.deactivate"
+      hum: "apsabers.hum"
+      swing: "apsabers.swing.fast"
+      clash: "apsabers.clash.metal"
+    # damage: 9.0 # Optional
+    enabled_abilities:
+      block_deflection: true
+      force_push: true
+      saber_throw: true
+      blaster_bolt_block: false # Vader might not need this visually, or it's implied
+      force_leap: false
+      stealth_cloak: true # More of a Sith Assassin trait, but an option
+
+  # Add more saber types here...

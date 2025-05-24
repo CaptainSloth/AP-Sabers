@@ -1,0 +1,29 @@
+name: APSabers
+version: ${project.version}
+main: com.adventureparkmc.robawesome.apsabers.APSabers
+api-version: '1.21' # Specifies compatibility with Minecraft 1.21
+author: RobAwesome
+description: A Star Wars lightsaber plugin for AdventureParkMC.
+website: https://www.adventureparkmc.com
+
+commands:
+  apsabers:
+    description: Main command for the APSabers plugin.
+    usage: |
+      /<command> give <player> <saber_type> [amount]
+      /<command> reload
+      /<command> list
+    aliases: [saber, sabers] # Optional aliases
+    permission: apsabers.admin # Example permission for the base command
+
+permissions:
+  apsabers.admin:
+    description: Allows usage of all APSabers admin commands.
+    default: op
+  apsabers.user: # Example if you add user-specific commands or abilities that need perms
+    description: Allows basic usage of lightsabers.
+    default: true
+  apsabers.ability.forcepush: # Example for specific ability permissions
+    description: Allows usage of the Force Push ability.
+    default: true # Or op, or false based on your design
+  # Add more specific permissions as needed
