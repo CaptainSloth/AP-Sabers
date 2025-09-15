@@ -67,16 +67,15 @@ public class PlayerDropItemListener implements Listener {
                     itemMetaFromEvent.setCustomModelData(saberType.getInactiveModelId());
                 }
 
-                // Apply the meta changes directly to the ItemStack object we got from the event
-                itemStackFromEvent.setItemMeta(itemMetaFromEvent);
+                ItemStack updatedStack = itemStackFromEvent.clone();
+                updatedStack.setItemMeta(itemMetaFromEvent);
 
-                // VERY IMPORTANT: Update the item stack within the event's Item entity.
-                // This tells the server "the item that would have been dropped is now this modified version."
-                event.getItemDrop().setItemStack(itemStackFromEvent);
-
-                // Now, cancel the event. The server should ensure the player "keeps" the item
-                // (which is now the modified itemStackFromEvent) in their inventory slot.
                 event.setCancelled(true);
+                event.getItemDrop().setItemStack(updatedStack);
+                event.getItemDrop().remove();
+
+                player.getInventory().setItemInMainHand(updatedStack);
+                player.updateInventory();
 
                 // Play sounds based on the new state
                 if ("active".equals(newState)) {
@@ -86,8 +85,7 @@ public class PlayerDropItemListener implements Listener {
                     player.stopSound(saberType.getHumSound(), SoundCategory.PLAYERS);
                     player.playSound(player.getLocation(), saberType.getDeactivateSound(), SoundCategory.PLAYERS, 1.0f, 1.0f);
                 }
-                // No need to call player.getInventory().setItemInMainHand() here.
-                // The cancellation of the event, after updating the event's item, should handle it.
+                // Updated inventory above ensures the visual change happens instantly.
             }
         }
     }

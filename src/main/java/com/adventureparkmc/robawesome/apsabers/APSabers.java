@@ -3,6 +3,7 @@ package com.adventureparkmc.robawesome.apsabers;
 import com.adventureparkmc.robawesome.apsabers.abilities.AbilityManager;
 import com.adventureparkmc.robawesome.apsabers.commands.SaberCommand;
 import com.adventureparkmc.robawesome.apsabers.commands.SaberTabCompleter;
+import com.adventureparkmc.robawesome.apsabers.gui.SaberMenuListener;
 import com.adventureparkmc.robawesome.apsabers.listeners.*;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -44,9 +45,10 @@ public class APSabers extends JavaPlugin {
         pm.registerEvents(new PlayerQuitListener(this), this); // For cleaning up player-specific data like active throws
         pm.registerEvents(new PlayerToggleSneakListener(this), this);
         pm.registerEvents(new BlockBreakListener(this), this);
+        pm.registerEvents(new SaberMenuListener(), this);
 
         getLogger().info("--------------------------------------");
-        getLogger().info(this.getDescription().getName() + " version " + this.getDescription().getVersion() + " has been enabled!");
+        getLogger().info("AP-Sabers version " + this.getDescription().getVersion() + " has been enabled!");
         getLogger().info("Developed by: " + this.getDescription().getAuthors());
         getLogger().info("May the Force be with you!");
         getLogger().info("--------------------------------------");
@@ -59,7 +61,7 @@ public class APSabers extends JavaPlugin {
             abilityManager.cleanupSaberThrows(); // Important for any saber throw tasks
         }
 
-        getLogger().info(this.getDescription().getName() + " has been disabled.");
+        getLogger().info("AP-Sabers has been disabled.");
     }
 
     // Getters

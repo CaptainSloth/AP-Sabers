@@ -2,28 +2,21 @@ package com.adventureparkmc.robawesome.apsabers.commands;
 
 import com.adventureparkmc.robawesome.apsabers.APSabers;
 import com.adventureparkmc.robawesome.apsabers.SaberType;
+import com.adventureparkmc.robawesome.apsabers.gui.SaberMenu;
+import com.adventureparkmc.robawesome.apsabers.items.SaberItemFactory;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment; // Ensure this import is present
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map; // Required for accessing plugin.yml command attributes
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SaberCommand implements CommandExecutor {
 
@@ -37,7 +30,11 @@ public class SaberCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            sendHelpMessage(sender);
+            if (isSaberMenuAlias(label)) {
+                openSaberMenu(sender);
+            } else {
+                sendHelpMessage(sender);
+            }
             return true;
         }
 
@@ -116,7 +113,7 @@ public class SaberCommand implements CommandExecutor {
             }
         }
 
-        ItemStack saberStack = createSaberItemStack(saberType);
+        ItemStack saberStack = SaberItemFactory.createSaber(plugin, saberType);
         if (saberStack == null) {
             sender.sendMessage(Component.text("Failed to create lightsaber item for type: " + saberTypeName + ". Check server logs for material errors.").color(NamedTextColor.RED));
             return;
@@ -137,55 +134,13 @@ public class SaberCommand implements CommandExecutor {
                 .append(Component.text("!").color(NamedTextColor.GREEN)));
     }
 
-    private ItemStack createSaberItemStack(SaberType saberType) {
-        if (saberType.getItemMaterial() == null) {
-            plugin.getLogger().warning("SaberType " + saberType.getInternalName() + " has a null material!");
-            return null;
-        }
-
-        ItemStack saberItem = new ItemStack(saberType.getItemMaterial());
-        ItemMeta meta = saberItem.getItemMeta();
-
-        if (meta == null) {
-            plugin.getLogger().severe("Could not get ItemMeta for material: " + saberType.getItemMaterial().name() + "! This is a critical issue.");
-            return new ItemStack(Material.STICK);
-        }
-
-        meta.displayName(legacySerializer.deserialize(saberType.getDisplayName()));
-
-        List<Component> loreComponents = saberType.getLore().stream()
-                .map(legacySerializer::deserialize)
-                .collect(Collectors.toList());
-        meta.lore(loreComponents);
-
-        meta.setCustomModelData(saberType.getInactiveModelId());
-
-        if (saberType.isEnchanted()) {
-            // Fix for line 147: Use a valid Enchantment constant
-            meta.addEnchant(Enchantment.VANISHING_CURSE, 1, true); // Using VANISHING_CURSE for glint
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-
-        meta.setUnbreakable(true);
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-
-        NamespacedKey typeKey = new NamespacedKey(plugin, "saber_type");
-        NamespacedKey stateKey = new NamespacedKey(plugin, "saber_state");
-
-        meta.getPersistentDataContainer().set(typeKey, PersistentDataType.STRING, saberType.getInternalName());
-        meta.getPersistentDataContainer().set(stateKey, PersistentDataType.STRING, "inactive");
-
-        saberItem.setItemMeta(meta);
-        return saberItem;
-    }
-
     private void handleReloadCommand(CommandSender sender) {
         if (!sender.hasPermission("apsabers.admin.reload") && !sender.hasPermission("apsabers.admin")) {
             sender.sendMessage(Component.text("You do not have permission to use this command.").color(NamedTextColor.RED));
             return;
         }
         plugin.getConfigManager().loadConfig();
-        sender.sendMessage(Component.text(plugin.getDescription().getName() + " configuration reloaded!").color(NamedTextColor.GREEN));
+        sender.sendMessage(Component.text("AP-Sabers configuration reloaded!").color(NamedTextColor.GREEN));
     }
 
     private void handleListCommand(CommandSender sender) {
@@ -200,7 +155,7 @@ public class SaberCommand implements CommandExecutor {
             return;
         }
 
-        sender.sendMessage(Component.text("--- Available Lightsaber Types ---").color(NamedTextColor.GOLD));
+        sender.sendMessage(Component.text("--- Available AP-Sabers Lightsabers ---").color(NamedTextColor.GOLD));
         for (String internalName : saberNames) {
             SaberType type = plugin.getConfigManager().getSaberType(internalName);
             Component line = Component.text("- ", NamedTextColor.AQUA)
@@ -217,7 +172,7 @@ public class SaberCommand implements CommandExecutor {
     }
 
     private void sendHelpMessage(CommandSender sender) {
-        sender.sendMessage(Component.text("--- APSabers Help ---").color(NamedTextColor.GOLD));
+        sender.sendMessage(Component.text("--- AP-Sabers Help ---").color(NamedTextColor.GOLD));
         if (sender.hasPermission("apsabers.admin") || sender.hasPermission("apsabers.admin.give")) {
             sender.sendMessage(Component.text("/apsabers give <player> <saber_type> [amount]", NamedTextColor.AQUA)
                     .append(Component.text(" - Gives a lightsaber.", NamedTextColor.GRAY)));
@@ -230,12 +185,34 @@ public class SaberCommand implements CommandExecutor {
             sender.sendMessage(Component.text("/apsabers reload", NamedTextColor.AQUA)
                     .append(Component.text(" - Reloads the plugin configuration.", NamedTextColor.GRAY)));
         }
+        if (sender instanceof Player && (sender.hasPermission("apsabers.user") || sender.hasPermission("apsabers.admin"))) {
+            sender.sendMessage(Component.text("/sabers", NamedTextColor.AQUA)
+                    .append(Component.text(" - Opens the AP-Sabers armory.", NamedTextColor.GRAY)));
+        }
         boolean hasAnyAdminPerm = sender.hasPermission("apsabers.admin") ||
                 sender.hasPermission("apsabers.admin.give") ||
                 sender.hasPermission("apsabers.admin.list") ||
                 sender.hasPermission("apsabers.admin.reload");
         if (!hasAnyAdminPerm && !(sender instanceof Player && ((Player)sender).isOp())) {
-            sender.sendMessage(Component.text("You do not have permission to use any admin commands.").color(NamedTextColor.YELLOW));
+            sender.sendMessage(Component.text("You do not have permission to use any AP-Sabers admin commands.").color(NamedTextColor.YELLOW));
         }
+    }
+
+    private boolean isSaberMenuAlias(String label) {
+        return label.equalsIgnoreCase("sabers") || label.equalsIgnoreCase("saber");
+    }
+
+    private void openSaberMenu(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(Component.text("Only players can open the AP-Sabers armory.").color(NamedTextColor.RED));
+            return;
+        }
+
+        if (!player.hasPermission("apsabers.user") && !player.hasPermission("apsabers.admin")) {
+            player.sendMessage(Component.text("You do not have permission to view the AP-Sabers armory.").color(NamedTextColor.RED));
+            return;
+        }
+
+        SaberMenu.open(plugin, player);
     }
 }
