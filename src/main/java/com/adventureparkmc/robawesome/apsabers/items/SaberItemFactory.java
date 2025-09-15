@@ -65,7 +65,7 @@ public final class SaberItemFactory {
      * @param saberType configuration describing the saber to display
      * @return {@link ItemStack} suitable for menu usage
      */
-    public static ItemStack createSaberIcon(SaberType saberType) {
+    public static ItemStack createSaberIcon(APSabers plugin, SaberType saberType) {
         ItemStack icon = new ItemStack(saberType.getItemMaterial());
         ItemMeta meta = icon.getItemMeta();
 
@@ -74,6 +74,9 @@ public final class SaberItemFactory {
         }
 
         applyBaseMeta(meta, saberType);
+
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        container.set(new NamespacedKey(plugin, "saber_menu_type"), PersistentDataType.STRING, saberType.getInternalName());
 
         // Provide a little more context for players browsing the menu
         List<Component> lore = meta.lore();

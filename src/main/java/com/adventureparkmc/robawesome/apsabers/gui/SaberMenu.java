@@ -57,7 +57,7 @@ public final class SaberMenu {
         holder.setInventory(inventory);
 
         for (SaberType type : saberTypes) {
-            inventory.addItem(SaberItemFactory.createSaberIcon(type));
+            inventory.addItem(SaberItemFactory.createSaberIcon(plugin, type));
         }
 
         player.openInventory(inventory);

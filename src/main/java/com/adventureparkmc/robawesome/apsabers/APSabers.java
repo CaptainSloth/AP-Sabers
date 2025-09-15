@@ -45,7 +45,7 @@ public class APSabers extends JavaPlugin {
         pm.registerEvents(new PlayerQuitListener(this), this); // For cleaning up player-specific data like active throws
         pm.registerEvents(new PlayerToggleSneakListener(this), this);
         pm.registerEvents(new BlockBreakListener(this), this);
-        pm.registerEvents(new SaberMenuListener(), this);
+        pm.registerEvents(new SaberMenuListener(this), this);
 
         getLogger().info("--------------------------------------");
         getLogger().info("AP-Sabers version " + this.getDescription().getVersion() + " has been enabled!");
