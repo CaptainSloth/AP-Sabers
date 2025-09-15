@@ -8,7 +8,7 @@ website: https://www.adventureparkmc.com
 
 commands:
   apsabers:
-    description: Main command for the APSabers plugin.
+    description: Main command for the AP-Sabers plugin.
     usage: |
       /<command> give <player> <saber_type> [amount]
       /<command> reload
@@ -18,10 +18,10 @@ commands:
 
 permissions:
   apsabers.admin:
-    description: Allows usage of all APSabers admin commands.
+    description: Allows usage of all AP-Sabers admin commands.
     default: op
   apsabers.user: # Example if you add user-specific commands or abilities that need perms
-    description: Allows basic usage of lightsabers.
+    description: Allows basic usage of AP-Sabers lightsabers.
     default: true
   apsabers.ability.forcepush: # Example for specific ability permissions
     description: Allows usage of the Force Push ability.
